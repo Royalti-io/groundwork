@@ -1,0 +1,30 @@
+{
+  "name": "@ikenga/skill-groundwork",
+  "version": "0.2.0",
+  "description": "Reusable research → design → plan → orchestrate → act skill for Claude Code.",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "agent-skills",
+    "skills",
+    "ikenga",
+    "groundwork",
+    "planning"
+  ],
+  "homepage": "https://ikenga.dev",
+  "bugs": {
+    "url": "https://github.com/royalti-io/groundwork/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/royalti-io/groundwork.git"
+  },
+  "license": "Apache-2.0",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "skills/"
+  ]
+}
