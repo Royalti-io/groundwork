@@ -58,6 +58,7 @@ PROFILE NOTES
 
 - {profile} = software → assume the reader is technical; library names, version numbers, RFC links, code excerpts are fine.
 - {profile} = general → no code vocabulary. "The codebase" → "existing assets / prior work / current constraints." "PRs" → "deliverables."
+- {profile} = content → no software vocabulary. "The codebase" → "prior pieces / existing brand assets / editorial standards." "PRs" → "pieces." Foreground audience, the competitive content landscape, precedent pieces, and channel performance.
 
 RETURN FORMAT
 

@@ -127,7 +127,14 @@ The `general` profile fills:
 - `{{vocab.freeze_gate_noun}}` → "decision lock"
 - OWNER instead of REPO; no PR-target language; "session seeded with this brief" instead of "branch + PR"
 
-**No code vocabulary leaks into a `general` orchestration.** This is Verification #8 in `01-plan.md`.
+The `content` profile fills:
+
+- `{{vocab.work_unit}}` → "piece" (or "asset")
+- `{{vocab.isolation_axis}}` → "channel + editorial slot"
+- `{{vocab.freeze_gate_noun}}` → "key-art lock" (or "brief/voice lock" for the upstream gate)
+- OWNER + CHANNEL instead of REPO; no PR-target language; "session seeded with this brief" instead of "branch + PR"; gates are brief/voice locks and key-art locks, not interface freezes
+
+**No code vocabulary leaks into a `general` *or* `content` orchestration.** This is Verification #8 in `01-plan.md`.
 
 ---
 

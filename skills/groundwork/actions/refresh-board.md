@@ -20,7 +20,7 @@
    - `artifact/assets/` (empty dir, `.gitkeep` placeholder + a one-line `README.md`) — for non-code artifacts the living spec or the board embeds: logos, screenshots, brand marks, exported diagrams. `general` profile plans use it more than `software` ones; the directory is cheap to scaffold regardless.
    - The board template itself is written to `artifact/board.html` (not `index.html` — `index.html` is reserved for the *living spec*, which is hand-authored).
    Register all four in `.groundwork.json.docs` with their initial hashes (assets/README.md tracked as a hand-authored file).
-3. **Build the board data model** from current docs + state:
+3. **Build the board data model** — get the base model from the script (`groundwork_state.py board-data --plan <plan>`), which derives `plan` / `gates` / `wps` / `designs` / `subplans` / `research` from the anchor + `01`. Enrich it with the per-WP `brief` text extracted from `09-orchestration.md` and the `decisions`/`coverage`/`waves` views the board needs. The shape:
    ```json
    {
      "plan": { "title": "<from 01>", "profile": "software", "goal": "<from .groundwork.json>" },

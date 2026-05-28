@@ -9,6 +9,14 @@
 
 **Read-only.** Never writes to disk. The cheapest possible action — makes the stateless-invocation problem legible to the user.
 
+**Mechanics**: don't recompute hashes or conformance by hand — get the computed model from the script and format it:
+
+```bash
+python3 <skill>/scripts/groundwork_state.py status-data --plan <plan> --profiles-root <skill>/profiles
+```
+
+It returns per-doc sync/drift + dirty-region lists (real sha256 diff), ID counts, sub-plan/design/research state, and the conformance verdict for **every** profile on disk. Render the report below from that JSON; the freshness ("X days old") and the suggested-actions ranking are the action's to compute from the returned stamps.
+
 ---
 
 ## What it reports
@@ -28,7 +36,7 @@ Documents
   05-tracking.md            ✗ hand edit inside `wp-matrix` fence — re-run orchestrate to overwrite
   09-orchestration.md       — not generated yet (run orchestrate)
   artifact/board.html       ⚠ stale: 3 input docs changed since refresh (run refresh-board)
-  artifact/index.html       — hand-authored living spec (not tracked by actions)
+  artifact/index.html       ⚠ spec-state fence empty (run refresh-living-spec)
 
 IDs (13 total)
   G-NN gaps:       2 open · 6 folded · 0 retired
@@ -82,14 +90,40 @@ The exact icon set: `✓` pass · `⚠` warn · `✗` fail · `—` n/a.
 
 ## Profile conformance check
 
-Walks each profile-required field (defined in `_shared/profile.json` + the active overlay) and confirms:
+The full profile contract — file layout, schema, resolution algorithm, validation rules — is specified in [`../lib/state.md` §"Profile contract"](../lib/state.md#profile-contract). `status` is the gate that enforces it.
 
-- All `vocab.*` keys present and non-empty.
-- All required spine files exist.
-- All `optional_blocks` named in the profile resolve to existing fence IDs or are absent (a missing optional block is fine — that's why it's optional).
-- The profile's `spine_version` is `<= current`.
+On every run, `status` validates **every** profile on disk under `.claude/skills/groundwork/profiles/<name>/` — not just the active one — so a hand-dropped invalid profile surfaces before the next `init` tries to use it. Rules 1–9 from the contract are **hard rejections** (the profile is reported ✗ with the canonical error message and is unselectable by `init`); rule 10 (unknown top-level key) is a **warn** with the offending key named.
 
-If a user-dropped profile (Phase 3) is loaded, this is the check that catches drift from the `_shared` base.
+Sample output:
+
+```
+Profile conformance
+  ✓ _shared           — base
+  ✓ software          — extends _shared
+  ✓ general           — extends _shared
+  ✓ content           — extends _shared
+  ✗ ops               — extends must be "_shared" (got undefined)        [rule 4]
+  ⚠ research          — unknown top-level key "owner" (allowed: name,…)   [rule 10]
+```
+
+Each line carries one of:
+
+| Glyph | Meaning | Trigger |
+|---|---|---|
+| `✓` | Conformant | Every rule passes |
+| `✗` | Rejected | Any of rules 1–9 fail; profile is excluded from `init` selection |
+| `⚠` | Warn | Rule 10 only — profile is still usable; preserves forward-compat |
+| `—` | n/a | `_shared` base (no `extends` rule applies) |
+
+When the **active** plan's profile is `✗`, every action other than `status` refuses with `plan uses non-conformant profile "<name>": <error>. Fix profile.json or run init --migrate.` (Migrate path is gated on a v2 spine — until then, fixing the profile.json is the only remediation.)
+
+The user-facing error messages are the canonical strings from `lib/state.md` §"Profile contract" rule table — do not paraphrase. They're load-bearing for users grepping logs or matching against documented failures.
+
+### What it does NOT check
+
+- **Template substitution rendering** — `status` doesn't render the spine templates to validate `{{vocab.*}}` placeholders resolve. That happens at `init` time (and a missing `vocab.*` is already caught by rule 6).
+- **Optional-block fence presence in already-scaffolded plans** — a profile that declares `optional_blocks: ["risks"]` doesn't require every existing plan to carry a `risks` fence. Optional means optional.
+- **Cross-profile uniqueness** — two profiles with the same `labels.work_unit` is fine; `name` is the only unique key (enforced by directory layout).
 
 ---
 
@@ -113,6 +147,7 @@ The "Next suggested actions" section is rule-based, not heuristic:
 | Any sub-plan with `status: active` whose ref WP is `queued` | "kick off <WP-NN> — its sub-plan is ready" |
 | Whole-file drift of `01`/`05` since last `orchestrate` | `groundwork orchestrate` |
 | Whole-file drift of inputs since last `refresh-board` | `groundwork refresh-board` |
+| `spec-state` fence in `artifact/index.html` is empty (`generated_at: null`) or its inputs drifted since `refresh_living_spec.last_run` | `groundwork refresh-living-spec` |
 | `clarify` would `fail` | "fix `<N>` blockers before orchestrating" |
 | Plan has never been orchestrated and clarify passes | `groundwork orchestrate` |
 
