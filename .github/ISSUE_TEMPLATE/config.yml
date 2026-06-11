@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: groundwork docs
+    url: https://ikenga.dev/docs/groundwork
+    about: Concepts, profiles, actions, the state model, the board, and orchestrate → Workflow.
+  - name: Why I built it
+    url: https://royalti.io/blog/groundwork-planning-that-doesnt-rot
+    about: The story behind groundwork.
