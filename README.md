@@ -21,7 +21,7 @@ Works with Claude Code, Codex, Gemini, Cursor, and 70+ other agents.
 
 ## What it does
 
-You give groundwork a goal. It scaffolds a folder of numbered, living documents — a plan, two research files, a discussion log, a tracking file, and a standalone HTML board you can open in any browser. Then it gives you a small set of actions you can run at any time: `research`, `design`, `review`, `orchestrate`, `refresh-board`.
+You give groundwork a goal. It scaffolds a folder of numbered, living documents — a plan, two research files, a discussion log, a tracking file, and standalone HTML views you can open in any browser. Then it gives you a small set of actions you can run at any time: `research`, `design`, `review`, `orchestrate`, `refresh-board`, `explorer`, `plans-index`.
 
 The part that matters: every block the skill generates is wrapped in a fenced region. **Everything outside a fence is yours and is never touched.** When you re-run an action, a checksum decides what changes on disk — not the model. A vibe you can't trust; a sha256 you can.
 
@@ -36,6 +36,22 @@ The board reads your tracking file and renders three views: mission control, Kan
 ![groundwork board — DAG view showing wave order and gate dependencies](assets/ss-board-dag.png)
 
 It is a [self-contained HTML artifact](https://ikenga.dev): open it in any browser, no server needed. Inside the Ikenga workspace it renders live next to your running sessions.
+
+---
+
+## The explorer
+
+`groundwork explorer` adds a second view beside the board: a file browser for the whole plan folder — a tree on the left, a tabbed viewer on the right. It opens the board, the living spec, and your designs as live preview tabs, with **full-text search** across every document.
+
+![groundwork explorer — file tree on the left, the plan board rendered live in a viewer tab](assets/ss-explorer.png)
+
+It's a single **fully-offline** file — React, the Markdown renderer, and the sanitizer are inlined, so it opens air-gapped, in Claude Desktop, or as a bare upload with no network. The view adapts to the profile: `design-system` opens on a gallery of live design thumbnails, `content` on a media grid.
+
+![groundwork explorer — the design-system profile's gallery of live mockup thumbnails](assets/ss-explorer-gallery.png)
+
+And `groundwork plans-index` rolls every plan in a directory into one dashboard — a card per plan with a work-package progress bar, drift indicator, and drill-in to each plan's explorer and board.
+
+![groundwork plans index — one card per plan with a progress bar, profile, drift dot, and drill-in buttons](assets/ss-plans-index.png)
 
 ---
 
@@ -88,6 +104,8 @@ The `design-system` profile adds a parts gallery, token pipeline, and a per-part
 | `clarify` | Readiness gate before `orchestrate` |
 | `orchestrate` | Emit `09-orchestration.md` with wave plan + WP briefs |
 | `refresh-board` | Regenerate `artifact/board.html` from current docs |
+| `explorer` | Regenerate `artifact/explorer.html` — a fully-offline file tree + tabbed viewer with search |
+| `plans-index` | Regenerate `<plans-dir>/_index.html` — a cross-plan dashboard, one card per plan |
 | `status` | Read-only freshness + ID + coverage report |
 
 Add `--emit-workflow` to `orchestrate` for a runnable Claude Code Workflow that fans waves out in parallel and turns freeze gates into sign-off barriers.
